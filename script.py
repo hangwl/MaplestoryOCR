@@ -75,13 +75,7 @@ class DataExtractor:
         df.to_csv(output_file, index=False)
         print(f"Data saved to {output_file}")
 
-    def clear_temp_folder(self):
-        temp_folder = "./temp"
-        if os.path.exists(temp_folder):
-            files = os.listdir(temp_folder)
-            for file in files:
-                file_path = os.path.join(temp_folder, file)
-                os.remove(file_path)
+            except IOError as e:
 
     def run_extraction(self):
         self.clear_temp_folder()
