@@ -5,26 +5,37 @@ from matplotlib import pyplot as plt
 import pandas as pd
 from PIL import Image
 from paddleocr import PaddleOCR
+import logging
 
-class DataExtractor:
-    def __init__(self, input_folder, threshold=100):
+class FileProcessor:
+    def __init__(self, input_folder):
         self.input_folder = input_folder
-        self.threshold = threshold
-        self.ocr_model = PaddleOCR(lang='en', use_angle_cls=False, show_log=False)
-
+    
     def list_files(self):
         return [os.path.join(self.input_folder, filename) for filename in os.listdir(self.input_folder)]
 
-    def read(self, file_path):
-        result = self.ocr_model.ocr(file_path)
-        return [line[1][0] for res in result for line in res]
+    @staticmethod
+    def clear_temp_folder():
+        temp_folder = "./temp"
+        if os.path.exists(temp_folder):
+            files = os.listdir(temp_folder)
+            for file in files:
+                file_path = os.path.join(temp_folder, file)
+                try:
+                    os.remove(file_path)
+                except OSError as e:
+                    logging.error(f"Error removing file: {file_path}. {e}")
 
+class ImageProcessor:
+    def __init__(self, threshold=100):
+        self.threshold = threshold
+    
     def preprocess(self, image_file):
         image = Image.open(image_file).convert("L")
         image = image.point(lambda p: 0 if p > self.threshold else 255)
         return image
 
-    def chop(self, image):
+    def chop(self, image):  # Added the 'self' parameter here
         width, height = image.size
         pixel_values_along_x = [image.getpixel((x, y)) for y in range(height) for x in range(width)]
         standard_dev_y = [statistics.stdev(pixel_values_along_x[y * width: (y + 1) * width]) for y in range(height)]
@@ -35,27 +46,17 @@ class DataExtractor:
         image_segments = [image.crop((0, y_start - 5, image.width, y_end + 5)) for y_start, y_end in y_bounds]
         return standard_dev_y, image_segments
 
-    def plot_std_dev_along_y(self, standard_dev_y):
-        height = len(standard_dev_y)
-        i = range(height)
-        plt.plot(i, standard_dev_y)
-        plt.xlabel('Y-Coordinate')
-        plt.ylabel('Std. Dev')
-        plt.title('Std. Dev along Y-axis')
-        plt.show()
+class OCRProcessor:
+    def __init__(self):
+        self.ocr_model = PaddleOCR(lang='en', use_angle_cls=False, show_log=False)
 
-    def read_segments(self):
-        results = []
-        for i, file in enumerate(self.list_files()):
-            preprocessed_image = self.preprocess(file)
-            std_dev_y, image_segments = self.chop(preprocessed_image)
-            for j, segment in enumerate(image_segments):
-                segment.save(f"./temp/{i}_{j}.jpg")
-                results.append(self.read(f"./temp/{i}_{j}.jpg"))
-            # self.plot_std_dev_along_y(std_dev_y)
-        return results
+    def read(self, file_path):
+        result = self.ocr_model.ocr(file_path)
+        return [line[1][0] for res in result for line in res]
 
-    def process_results(self, results):
+class DataProcessor:
+    @staticmethod
+    def process_results(results: list):
         final_results = []
         for result in results:
             scores = result[-3:]
@@ -75,14 +76,42 @@ class DataExtractor:
         df.to_csv(output_file, index=False)
         print(f"Data saved to {output_file}")
 
+class DataExtractor:
+    def __init__(self, input_folder, threshold=100):
+        self.file_processor = FileProcessor(input_folder)
+        self.image_processor = ImageProcessor(threshold)
+        self.ocr_processor = OCRProcessor()
+
+    def read_segments(self):
+        results = []
+        for i, file in enumerate(self.file_processor.list_files()):
+            try:
+                preprocessed_image = self.image_processor.preprocess(file)
             except IOError as e:
+                logging.error(f"Error processing file: {file}. {e}")
+                continue
+
+            std_dev_y, image_segments = self.image_processor.chop(preprocessed_image)
+            for j, segment in enumerate(image_segments):
+                try:
+                    segment.save(f"./temp/{i}_{j}.jpg")
+                except IOError as e:
+                    logging.error(f"Error saving segment: {i}_{j}.jpg. {e}")
+                    continue
+
+                results.append(self.ocr_processor.read(f"./temp/{i}_{j}.jpg"))
+            # self.image_processor.plot_std_dev_along_y(std_dev_y)
+        return results
 
     def run_extraction(self):
-        self.clear_temp_folder()
+        self.file_processor.clear_temp_folder()
         results = self.read_segments()
-        self.process_results(results)
+        DataProcessor.process_results(results)
 
 if __name__ == '__main__':
+    log_file_path = 'logs.txt'
+    logging.basicConfig(filename=log_file_path, level=logging.ERROR, format='%(asctime)s [%(levelname)s] %(message)s')
+
     input_folder = "./input"
     threshold = 100
     extractor = DataExtractor(input_folder, threshold)
