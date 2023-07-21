@@ -82,6 +82,15 @@ class DataExtractor:
         self.image_processor = ImageProcessor(threshold)
         self.ocr_processor = OCRProcessor()
 
+    def plot_std_dev_along_y(self, standard_dev_y):
+        height = len(standard_dev_y)
+        i = range(height)
+        plt.plot(i, standard_dev_y)
+        plt.xlabel('Y-Coordinate')
+        plt.ylabel('Std. Dev')
+        plt.title('Std. Dev along Y-axis')
+        plt.show()
+
     def read_segments(self):
         results = []
         for i, file in enumerate(self.file_processor.list_files()):
@@ -100,7 +109,8 @@ class DataExtractor:
                     continue
 
                 results.append(self.ocr_processor.read(f"./temp/{i}_{j}.jpg"))
-            # self.image_processor.plot_std_dev_along_y(std_dev_y)
+            # self.plot_std_dev_along_y(std_dev_y)
+            # algo to interpret plots(?)
         return results
 
     def run_extraction(self):
