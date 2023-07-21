@@ -34,8 +34,9 @@ class ImageProcessor:
         image = Image.open(image_file).convert("L")
         image = image.point(lambda p: 0 if p > self.threshold else 255)
         return image
-
-    def chop(self, image):  # Added the 'self' parameter here
+        
+    @staticmethod
+    def chop(image):
         width, height = image.size
         pixel_values_along_x = [image.getpixel((x, y)) for y in range(height) for x in range(width)]
         standard_dev_y = [statistics.stdev(pixel_values_along_x[y * width: (y + 1) * width]) for y in range(height)]
@@ -48,10 +49,16 @@ class ImageProcessor:
 
 class OCRProcessor:
     def __init__(self):
-        self.ocr_model = PaddleOCR(lang='en', use_angle_cls=False, show_log=False)
+        self.ocr_model = None  # Initialize the OCR model as None
+    
+    def get_ocr_model(self):
+        if self.ocr_model is None:
+            self.ocr_model = PaddleOCR(lang='en', use_angle_cls=False, show_log=False)
+        return self.ocr_model
 
     def read(self, file_path):
-        result = self.ocr_model.ocr(file_path)
+        ocr_model = self.get_ocr_model()  # Lazy initialization of the OCR model
+        result = ocr_model.ocr(file_path)
         return [line[1][0] for res in result for line in res]
 
 class DataProcessor:
