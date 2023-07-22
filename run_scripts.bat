@@ -13,6 +13,7 @@ call %VENV_NAME%\Scripts\activate
 
 REM Run the Python script.
 python scripts\get_contributions.py
+python scripts\fuzz_igns.py
 
 REM Deactivate the virtual environment.
 deactivate

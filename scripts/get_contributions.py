@@ -16,7 +16,7 @@ class FileProcessor:
 
     @staticmethod
     def clear_temp_folder():
-        temp_folder = "./temp"
+        temp_folder = "./data/temp"
         if os.path.exists(temp_folder):
             files = os.listdir(temp_folder)
             for file in files:
@@ -79,9 +79,9 @@ class DataProcessor:
             final_results.append([name, level, culvert, flag])
 
         df = pd.DataFrame(final_results, columns=['IGN', 'LVL', 'CULVERT', 'FLAG'])
-        output_file = f"./{date.today()}.csv"
+        output_file = f"./data/output/{date.today()}_raw.csv"
         df.to_csv(output_file, index=False)
-        print(f"Data saved to {output_file}")
+        print(f"Raw data saved to {output_file}")
 
 class DataExtractor:
     def __init__(self, input_folder, threshold=100):
@@ -110,12 +110,12 @@ class DataExtractor:
             std_dev_y, image_segments = self.image_processor.chop(preprocessed_image)
             for j, segment in enumerate(image_segments):
                 try:
-                    segment.save(f"./temp/{i}_{j}.jpg")
+                    segment.save(f"./data/temp/{i}_{j}.jpg")
                 except IOError as e:
                     logging.error(f"Error saving segment: {i}_{j}.jpg. {e}")
                     continue
 
-                results.append(self.ocr_processor.read(f"./temp/{i}_{j}.jpg"))
+                results.append(self.ocr_processor.read(f"./data/temp/{i}_{j}.jpg"))
             # self.plot_std_dev_along_y(std_dev_y)
             # algo to interpret plots(?)
         return results
@@ -129,7 +129,7 @@ if __name__ == '__main__':
     log_file_path = 'logs.txt'
     logging.basicConfig(filename=log_file_path, level=logging.ERROR, format='%(asctime)s [%(levelname)s] %(message)s')
 
-    input_folder = "./input"
+    input_folder = "./data/input"
     threshold = 100
     extractor = DataExtractor(input_folder, threshold)
     extractor.run_extraction()
