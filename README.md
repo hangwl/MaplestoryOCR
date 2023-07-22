@@ -25,5 +25,8 @@ run_scripts.bat
 
 ## Scripts
 
-- get_contributions.py preprocesses and segments screenshots from the ./data/input folder into the ./data/temp folder. 
-- fuzz_igns.py uses thefuzz library to implement the fuzzy string matching algorithm on raw IGN strings and takes the ./data/guild_assets/igns.csv file as an input for IGN choices. The final output is saved in the ./data/output folder, with the current date in the filename.
+```get_contributions.py``` 
+preprocesses and segments screenshots from the ./data/input folder into the ./data/temp folder. 
+
+```fuzz_igns.py``` 
+uses thefuzz library to implement the fuzzy string matching algorithm on raw IGN strings and takes the ./data/guild_assets/igns.csv file as an input for IGN choices. The final output is saved in the ./data/output folder, with the current date in the filename.
