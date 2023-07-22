@@ -3,12 +3,9 @@
 The following script uses PaddleOCR to extract guild contribution data in GMS. Extracted data is saved as a CSV file in the root folder.
 
 ## Requirements
-
 - Python 3.7.9
 
-## Installation and Setup
-
-Follow these steps to set up the environment and run the script:
+## How to Use (Windows)
 
 ### 1. Clone the Repository
 ```
@@ -16,21 +13,14 @@ bash
 git clone https://github.com/hangwl/MaplestoryOCR.git
 ```
 
-### 2. Set Up a Virtual Environment
+### 2. Setup Necessary Dependencies
 ```
-python3.7
-python -m venv .venv # Create the virtual environment
-source .venv/bin/activate # Activate the virtual environment
+setup.bat
 ```
 
-### 3. Install Dependencies
+### 3. Run Script 
 ```
-pip install -r requirements.txt
-```
-
-### 4. Run the Script
-```
-python script.py
+get_contributions.bat
 ```
 
-The script will preprocess and segment screenshots from the ./input folder into the ./temp folder. Data is then extracted from each individual segment, and stored as a CSV file as the final output, with the current date in the filename.
+The get_contributions script preprocesses and segments screenshots from the ./input folder into the ./temp folder. Data is then extracted from each individual segment, and stored as a CSV file as the final output, with the current date in the filename.
