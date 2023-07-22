@@ -20,7 +20,9 @@ setup.bat
 
 ### 3. Run Script 
 ```
-get_contributions.bat
+run_scripts.bat
 ```
 
-The get_contributions script preprocesses and segments screenshots from the ./input folder into the ./temp folder. Data is then extracted from each individual segment, and stored as a CSV file as the final output, with the current date in the filename.
+The get_contributions script preprocesses and segments screenshots from the ./data/input folder into the ./data/temp folder. Data is then extracted from each individual segment, and stored as a raw CSV file as the output in the ./data/output folder, with the current date in the filename.
+
+The fuzz_igns script uses thefuzz library to implement the fuzzy string matching algorithm on raw ign strings and takes the ./data/guild_assets/igns.csv file as an input for ign choices. The final output is stored as a CSV file as the final output in the ./data/output folder, with the current date in the filename.
