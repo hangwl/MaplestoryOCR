@@ -23,6 +23,7 @@ setup.bat
 run_scripts.bat
 ```
 
-The get_contributions script preprocesses and segments screenshots from the ./data/input folder into the ./data/temp folder. Data is then extracted from each individual segment, and stored as a raw CSV file as the output in the ./data/output folder, with the current date in the filename.
+## Scripts
 
-The fuzz_igns script uses thefuzz library to implement the fuzzy string matching algorithm on raw ign strings and takes the ./data/guild_assets/igns.csv file as an input for ign choices. The final output is stored as a CSV file as the final output in the ./data/output folder, with the current date in the filename.
+- get_contributions.py preprocesses and segments screenshots from the ./data/input folder into the ./data/temp folder. 
+- fuzz_igns.py uses thefuzz library to implement the fuzzy string matching algorithm on raw IGN strings and takes the ./data/guild_assets/igns.csv file as an input for IGN choices. The final output is saved in the ./data/output folder, with the current date in the filename.
